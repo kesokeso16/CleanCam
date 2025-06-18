@@ -51,7 +51,7 @@
     <option>なし</option>
   </select><br><br>
 
-  <button onclick="generateImage()">📸 情報入り画像を生成する</button>
+  <button onclick="generateImage()">📸 記録用画像を作成（物件・場所・日付入り）</button>
 
   <canvas id="canvas" width="640" height="480"></canvas>
 
@@ -95,7 +95,6 @@
             ctx.fillText(line, 20, y);
           });
 
-          // 保存用画像生成
           const imageURL = canvas.toDataURL("image/png");
           const downloadBtn = document.getElementById('downloadBtn');
           downloadBtn.href = imageURL;
