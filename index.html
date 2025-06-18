@@ -140,7 +140,7 @@
           const labelHeight = 4 * 50 + 40;
           ctx.fillRect(canvas.width - 450, 0, 450, labelHeight);
 
-          ctx.font = '120px sans-serif';
+          ctx.font = '160px sans-serif';
           ctx.fillStyle = 'white';
           ctx.strokeStyle = 'black';
           ctx.lineWidth = 3;
@@ -156,7 +156,7 @@
           ];
 
           textLines.forEach((line, i) => {
-            const y = 20 + i * 50;
+            const y = 20 + i * 170;
             const x = canvas.width - 30;
             ctx.strokeText(line, x, y);
             ctx.fillText(line, x, y);
