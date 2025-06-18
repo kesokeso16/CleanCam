@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>中尾式・清掃カメラ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; text-align: center; }
+    canvas { border: 1px solid #ccc; margin-top: 20px; max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <h1>清掃タグ付きカメラ</h1>
+
+  <input type="file" accept="image/*" capture="environment" id="photoInput"><br><br>
+
+  <input type="text" placeholder="物件名" id="building"><br><br>
+
+  <select id="floor">
+    <option value="1階">1階</option>
+    <option value="2階">2階</option>
+    <option value="3階">3階</option>
+    <option value="4階">4階</option>
+    <option value="5階">5階</option>
+    <option value="6階">6階</option>
+    <option value="B1">B1</option>
+  </select><br><br>
+
+  <input type="text" placeholder="部屋番号" id="room"><br><br>
+
+  <select id="location">
+    <option>廊下</option>
+    <option>階段</option>
+    <option>トイレ</option>
+    <option>エントランス</option>
+    <option>駐車場</option>
+  </select><br><br>
+
+  <select id="light">
+    <option>LED</option>
+    <option>丸形蛍光灯</option>
+    <option>白熱灯</option>
+    <option>なし</option>
+  </select><br><br>
+
+  <button onclick="generateImage()">📸 情報入り画像を生成する</button>
+
+  <canvas id="canvas" width="640" height="480"></canvas>
+
+  <script>
+    function generateImage() {
+      const file = document.getElementById('photoInput').files[0];
+      if (!file) return alert('写真を撮ってください！');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          ctx.drawImage(img, 0, 0);
+
+          ctx.font = '28px sans-serif';
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 2;
+
+          const date = new Date().toLocaleString();
+          const textLines = [
+            `📍 ${document.getElementById('building').value} ${document.getElementById('floor').value} ${document.getElementById('room').value}`,
+            `🧽 場所: ${document.getElementById('location').value}`,
+            `💡 電灯型: ${document.getElementById('light').value}`,
+            `📅 ${date}`
+          ];
+
+          textLines.forEach((line, i) => {
+            const y = 40 + i * 40;
+            ctx.strokeText(line, 20, y);
+            ctx.fillText(line, 20, y);
+          });
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
