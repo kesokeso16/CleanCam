@@ -60,7 +60,7 @@
 <body>
   <h1>清掃タグ付きカメラ</h1>
 
-  <label for="photoInput" class="camera-button">📷 カメラを起動して写真を撮る</label>
+  <label for="photoInput" class="camera-button">📷写真を撮る</label>
   <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none;"><br><br>
 
   <input type="text" placeholder="物件名" id="building"><br><br>
@@ -72,6 +72,11 @@
     <option value="4階">4階</option>
     <option value="5階">5階</option>
     <option value="6階">6階</option>
+    <option value="7階">7階</option>
+    <option value="8階">8階</option>
+    <option value="9階">9階</option>
+    <option value="10階">10階</option>
+    <option value="11階">11階</option>
     <option value="B1">B1</option>
   </select><br><br>
 
@@ -80,21 +85,26 @@
   <select id="location">
     <option>廊下</option>
     <option>階段</option>
+　　<option>エントランス</option>
+    <option>エレベーター</option>
     <option>トイレ</option>
-    <option>エントランス</option>
-    <option>駐車場</option>
+    <option>ゴミ置き場</option>
+    <option>駐車場・駐輪場</option>
   </select><br><br>
 
   <select id="light">
-    <option>LED</option>
-    <option>丸形蛍光灯</option>
-    <option>白熱灯</option>
-    <option>なし</option>
+    <option>20W蛍光灯</option>
+    <option>丸形30W蛍光灯</option>
+    <option>白熱電球</option>
+　　<option>30W蛍光灯</option>
+    <option>丸形20W蛍光灯</option>
+    <option>LED電球</option>
+　　<option>なし</option>
   </select><br><br>
 
   <!-- ★ デカくなった生成ボタン -->
   <button onclick="generateImage()" class="generate-button">
-    📸 記録用画像を作成（物件・場所・日付入り）
+    📸 記録用画像を作成
   </button>
 
   <canvas id="canvas" width="640" height="480"></canvas>
@@ -121,7 +131,7 @@
           ctx.drawImage(img, 0, 0);
 
           // テキスト描画設定
-          ctx.font = '40px sans-serif';
+          ctx.font = '120px sans-serif';
           ctx.fillStyle = 'white';
           ctx.strokeStyle = 'black';
           ctx.lineWidth = 4;
