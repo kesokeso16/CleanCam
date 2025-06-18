@@ -15,13 +15,13 @@
   <style>
     body { font-family: sans-serif; padding: 20px; text-align: center; }
     canvas { border: 1px solid #ccc; margin-top: 20px; max-width: 100%; height: auto; }
+    #downloadBtn button { padding: 10px 20px; font-size: 18px; margin-top: 20px; }
   </style>
 </head>
 <body>
   <h1>清掃タグ付きカメラ</h1>
 
   <input type="file" accept="image/*" capture="environment" id="photoInput"><br><br>
-
   <input type="text" placeholder="物件名" id="building"><br><br>
 
   <select id="floor">
@@ -54,6 +54,11 @@
   <button onclick="generateImage()">📸 情報入り画像を生成する</button>
 
   <canvas id="canvas" width="640" height="480"></canvas>
+
+  <a id="downloadBtn" style="display:none" download="clean_photo.png">
+    <button>📥 画像を保存する</button>
+  </a>
+  <p id="saveNote" style="display:none">※iPhoneは画像を長押しで保存してください</p>
 
   <script>
     function generateImage() {
@@ -89,6 +94,13 @@
             ctx.strokeText(line, 20, y);
             ctx.fillText(line, 20, y);
           });
+
+          // 保存用画像生成
+          const imageURL = canvas.toDataURL("image/png");
+          const downloadBtn = document.getElementById('downloadBtn');
+          downloadBtn.href = imageURL;
+          downloadBtn.style.display = "inline-block";
+          document.getElementById('saveNote').style.display = "block";
         };
         img.src = e.target.result;
       };

@@ -16,3 +16,8 @@ self.addEventListener('fetch', function(e) {
     })
   );
 });
+const imageURL = canvas.toDataURL("image/png");
+const downloadBtn = document.getElementById('downloadBtn');
+downloadBtn.href = imageURL;
+downloadBtn.style.display = "inline-block";
+document.getElementById('saveNote').style.display = "block";
