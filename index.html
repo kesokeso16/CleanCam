@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
+      window.addEventListener('load', function () {
         navigator.serviceWorker.register('sw.js');
       });
     }
@@ -16,29 +16,27 @@
     body { font-family: sans-serif; padding: 20px; text-align: center; }
     canvas { border: 1px solid #ccc; margin-top: 20px; max-width: 100%; height: auto; }
     #downloadBtn button { padding: 10px 20px; font-size: 18px; margin-top: 20px; }
+    .camera-button {
+      display: inline-block;
+      background-color: #2c7be5;
+      color: white;
+      font-size: 20px;
+      padding: 15px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .camera-button:hover {
+      background-color: #1a5acb;
+    }
   </style>
-<style>
-  .camera-button {
-    display: inline-block;
-    background-color: #2c7be5;
-    color: white;
-    font-size: 20px;
-    padding: 15px 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 20px;
-  }
-  .camera-button:hover {
-    background-color: #1a5acb;
-  }
-</style>
-
 </head>
 <body>
   <h1>清掃タグ付きカメラ</h1>
 
-<label for="photoInput" class="camera-button">📷 カメラを起動して写真を撮る</label>
-<input type="file" accept="image/*" capture="environment" id="photoInput" style="display: none;"><br><br>
+  <label for="photoInput" class="camera-button">📷 カメラを起動して写真を撮る</label>
+  <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none;"><br><br>
+
   <input type="text" placeholder="物件名" id="building"><br><br>
 
   <select id="floor">
@@ -72,7 +70,7 @@
 
   <canvas id="canvas" width="640" height="480"></canvas>
 
-  <a id="downloadBtn" style="display:none" download="clean_photo.png">
+  <a id="downloadBtn" style="display:none">
     <button>📥 画像を保存する</button>
   </a>
   <p id="saveNote" style="display:none">※iPhoneは画像を長押しで保存してください</p>
@@ -83,9 +81,9 @@
       if (!file) return alert('写真を撮ってください！');
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
           const canvas = document.getElementById('canvas');
           const ctx = canvas.getContext('2d');
           canvas.width = img.width;
@@ -93,10 +91,11 @@
 
           ctx.drawImage(img, 0, 0);
 
-          ctx.font = '28px sans-serif';
+          // デカ文字&視認性UP
+          ctx.font = '40px sans-serif';
           ctx.fillStyle = 'white';
           ctx.strokeStyle = 'black';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 4;
 
           const date = new Date().toLocaleString();
           const textLines = [
@@ -107,16 +106,32 @@
           ];
 
           textLines.forEach((line, i) => {
-            const y = 40 + i * 40;
+            const y = 50 + i * 50;
             ctx.strokeText(line, 20, y);
             ctx.fillText(line, 20, y);
           });
 
           const imageURL = canvas.toDataURL("image/png");
+
+          // ダウンロードリンク更新
           const downloadBtn = document.getElementById('downloadBtn');
+          const building = document.getElementById('building').value || "cleanphoto";
+          const now = new Date();
+          const filename = `${building}_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}.png`.replace(/[^\w\-]/g, "_");
           downloadBtn.href = imageURL;
+          downloadBtn.download = filename;
           downloadBtn.style.display = "inline-block";
+
           document.getElementById('saveNote').style.display = "block";
+
+          // 実画像を表示して長押し保存を可能にする
+          const preview = document.createElement('img');
+          preview.src = imageURL;
+          preview.style = "margin-top:20px;max-width:100%;border:2px solid #ccc;";
+          document.body.appendChild(preview);
+
+          // フォーム初期化
+          document.getElementById('photoInput').value = "";
         };
         img.src = e.target.result;
       };
