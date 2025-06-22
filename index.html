@@ -13,22 +13,22 @@
     .camera-button, .zip-button { font-size: 20px; padding: 15px 30px; border-radius: 8px; cursor: pointer; margin: 10px; color: white; border: none; }
     .camera-button { background-color: #2c7be5; }
     .zip-button { background-color: #28a745; }
-   label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 5px;
-  text-align: left;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-   }
-   label input[type="checkbox"] {
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: left;
+      max-width: 400px;
+      margin: 5px auto;
+      font-size: 20px;
+    }
+    label input[type="checkbox"] {
       transform: scale(1.5);
-   }
-   label span {
-      font-size: 24px;
-   }
+      margin-right: 10px;
+    }
+    label span {
+      flex-grow: 1;
+    }
   </style>
 </head>
 <body>
@@ -60,11 +60,11 @@
   <textarea id="customTags" placeholder="🏷️ カスタムタグ（カンマ区切り）"></textarea>
 
   <div id="checklist">
-    <label><input type="checkbox" value="カビあり"> 🧫 カビあり</label>
-    <label><input type="checkbox" value="水漏れあり"> 💧 水漏れあり</label>
-    <label><input type="checkbox" value="ゴミ残置"> 🗑️ ゴミ残置</label>
-    <label><input type="checkbox" value="異臭あり"> 🤢 異臭あり</label>
-    <label><input type="checkbox" value="破損あり"> 🪵 破損あり</label>
+    <label><input type="checkbox" value="カビあり"><span>🧫 カビあり</span></label>
+    <label><input type="checkbox" value="水漏れあり"><span>💧 水漏れあり</span></label>
+    <label><input type="checkbox" value="ゴミ残置"><span>🗑️ ゴミ残置</span></label>
+    <label><input type="checkbox" value="異臭あり"><span>🤢 異臭あり</span></label>
+    <label><input type="checkbox" value="破損あり"><span>🪵 破損あり</span></label>
   </div>
 
   <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
