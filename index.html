@@ -1,72 +1,131 @@
-<!DOCT<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>中尾式・清掃カメラ</title>
+  <title>中尾式・カスタム清掃カメラ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    input, select { font-size: 20px; padding: 10px; margin: 10px; width: 80%; max-width: 400px; }
-    .btn { font-size: 20px; padding: 15px 30px; border-radius: 8px; margin: 10px; cursor: pointer; border: none; }
-    .main-btn { background-color: #007bff; color: white; }
-    .save-btn { background-color: #28a745; color: white; }
+    body { font-family: sans-serif; padding: 20px; text-align: center; }
+    input, select, textarea { font-size: 20px; padding: 10px; margin: 10px; width: 80%; max-width: 400px; }
     canvas { display: none; }
+    img.preview { margin-top: 20px; max-width: 100%; border: 2px solid #ccc; }
+    .camera-button, .generate-button, .zip-button { font-size: 20px; padding: 15px 30px; border-radius: 8px; cursor: pointer; margin: 10px; color: white; border: none; }
+    .camera-button { background-color: #2c7be5; }
+    .generate-button { background-color: #007bff; }
+    .zip-button { background-color: #28a745; }
+    label { display: block; margin-top: 5px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
   <h1>CLEAN CAM</h1>
-  <input type="file" accept="image/*" capture="environment" id="photoInput"><br>
-  <input type="text" placeholder="物件名" id="building"><br>
-  <select id="floor"><option>1階</option><option>2階</option><option>3階</option></select><br>
-  <input type="text" placeholder="部屋番" id="room"><br>
-  <select id="location"><option>廊下</option><option>階段</option><option>トイレ</option></select><br>
-  <select id="light"><option>LED</option><option>蛍光灯</option></select><br>
-  <button class="btn main-btn" onclick="generateImage()">📸 記録画像作成</button>
-  <button class="btn save-btn" onclick="downloadZip()">📦 ZIP保存</button>
 
-  <canvas id="canvas" width="640" height="480"></canvas>
-  <div id="previewBox"></div>
+  <label for="photoInput" class="camera-button">📷 カメラを起動する</label>
+  <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none"><br>
+
+  <input type="text" placeholder="物件名" id="building">
+  <select id="floor">
+    <option value="1階">1階</option><option value="2階">2階</option><option value="3階">3階</option>
+    <option value="4階">4階</option><option value="5階">5階</option><option value="6階">6階</option>
+    <option value="7階">7階</option><option value="8階">8階</option><option value="9階">9階</option>
+    <option value="B1">B1</option>
+  </select>
+  <input type="text" placeholder="部屋番/備考/など" id="room">
+
+  <select id="location">
+    <option>廊下</option><option>階段</option><option>エレベーター</option>
+    <option>エントランス</option><option>非常階段</option><option>トイレ</option>
+    <option>ゴミ置き場</option><option>駐車場・駐輪場</option>
+  </select>
+
+  <select id="light">
+    <option>20w蛍光灯</option><option>30w丸形蛍光灯</option><option>LED電球</option>
+    <option>30w蛍光灯</option><option>20w丸形蛍光灯</option><option>白熱電球</option><option>なし</option>
+  </select>
+
+  <textarea id="customTags" placeholder="🏷️ カスタムタグ（カンマ区切り）"></textarea>
+
+  <div id="checklist">
+    <label><input type="checkbox" value="カビあり"> 🧫 カビあり</label>
+    <label><input type="checkbox" value="水漏れあり"> 💧 水漏れあり</label>
+    <label><input type="checkbox" value="ゴミ残置"> 🗑️ ゴミ残置</label>
+    <label><input type="checkbox" value="異臭あり"> 🤢 異臭あり</label>
+    <label><input type="checkbox" value="破損あり"> 🪵 破損あり</label>
+  </div>
+
+  <button onclick="generateImage()" class="generate-button">📸 記録用画像を作成</button>
+  <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
+
+  <canvas id="canvas"></canvas>
+  <div id="previewContainer"></div>
 
   <script>
-    let imageBlob;
+    const images = [];
+
+    document.getElementById('photoInput').addEventListener('change', () => {
+      generateImage();
+    });
+
     function generateImage() {
       const file = document.getElementById('photoInput').files[0];
-      if (!file) return alert('写真撮って！');
+      if (!file) return alert('写真を選んでください');
+
       const reader = new FileReader();
       reader.onload = function (e) {
         const img = new Image();
         img.onload = function () {
           const canvas = document.getElementById('canvas');
           const ctx = canvas.getContext('2d');
-          canvas.width = img.width; canvas.height = img.height;
+          canvas.width = img.width;
+          canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
-          ctx.font = '60px sans-serif';
-          ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-          ctx.fillStyle = 'rgba(0,0,0,0.5)';
-          ctx.fillRect(canvas.width - 900, 20, 880, 300);
-          ctx.fillStyle = 'white'; ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
-          const lines = [
-            `📍 ${building.value} ${floor.value} ${room.value}`,
-            `🧽 ${location.value}  💡${light.value}`,
-            `📅 ${new Date().toLocaleString()}`
+
+          ctx.font = '160px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          ctx.lineWidth = 3;
+
+          const date = new Date().toLocaleString();
+          const textLines = [
+            `📍 ${document.getElementById('building').value} ${document.getElementById('floor').value} ${document.getElementById('room').value}`,
+            `🧽 場所: ${document.getElementById('location').value}`,
+            `💡 電灯型: ${document.getElementById('light').value}`,
+            `📅 ${date}`
           ];
-          lines.forEach((line, i) => {
-            const y = 40 + i * 90;
-            const x = canvas.width - 30;
+
+          // checklist
+          document.querySelectorAll('#checklist input[type="checkbox"]').forEach(chk => {
+            if (chk.checked) textLines.push(`✅ ${chk.value}`);
+          });
+
+          // custom tags
+          const customText = document.getElementById('customTags').value;
+          if (customText) customText.split(',').forEach(tag => textLines.push(`🏷️ ${tag.trim()}`));
+
+          const maxWidth = Math.max(...textLines.map(t => ctx.measureText(t).width));
+          const lineHeight = 180;
+          const padding = 30;
+          ctx.fillStyle = 'rgba(0,0,0,0.5)';
+          ctx.fillRect(canvas.width - maxWidth - padding * 2, 20, maxWidth + padding * 2, textLines.length * lineHeight + padding);
+
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = 'black';
+          textLines.forEach((line, i) => {
+            const x = canvas.width - padding;
+            const y = 20 + padding / 2 + i * lineHeight;
             ctx.strokeText(line, x, y);
             ctx.fillText(line, x, y);
           });
-          canvas.toBlob(blob => {
-            imageBlob = blob;
-            const url = URL.createObjectURL(blob);
-            const imgEl = new Image();
-            imgEl.src = url;
-            imgEl.style = "max-width:100%;margin-top:20px;border:2px solid #ccc";
-            const previewBox = document.getElementById('previewBox');
-            previewBox.innerHTML = ''; previewBox.appendChild(imgEl);
-          });
+
+          const imageURL = canvas.toDataURL('image/jpeg');
+          images.push({ filename: `clean_${Date.now()}.jpg`, data: imageURL });
+
+          const preview = document.createElement('img');
+          preview.src = imageURL;
+          preview.className = 'preview';
+          document.getElementById('previewContainer').appendChild(preview);
+
+          document.getElementById('photoInput').value = "";
         };
         img.src = e.target.result;
       };
@@ -74,13 +133,16 @@
     }
 
     function downloadZip() {
-      if (!imageBlob) return alert('先に画像作って');
+      if (images.length === 0) return alert("保存する画像がありません");
       const zip = new JSZip();
-      const now = new Date();
-      const filename = `${building.value}_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}.png`;
-      zip.file(filename, imageBlob);
-      zip.generateAsync({type: "blob"}).then(function(content) {
-        saveAs(content, "clean_photos.zip");
+      images.forEach(img => {
+        zip.file(img.filename, img.data.split(',')[1], { base64: true });
+      });
+      zip.generateAsync({ type: 'blob' }).then(content => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = 'clean_photos.zip';
+        link.click();
       });
     }
   </script>
