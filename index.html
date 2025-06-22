@@ -13,7 +13,7 @@
     .camera-button, .zip-button { font-size: 20px; padding: 15px 30px; border-radius: 8px; cursor: pointer; margin: 10px; color: white; border: none; }
     .camera-button { background-color: #2c7be5; }
     .zip-button { background-color: #28a745; }
-    label { display: flex; align-items: center; gap: 10px; margin-top: 5px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; font-size: 18px; }
+    label { display: flex; align-items: center; gap: 5px; margin-top: 5px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; font-size: 18px; }
   </style>
 </head>
 <body>
@@ -53,6 +53,7 @@
   </div>
 
   <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
+  <button onclick="shareZip()" class="zip-button" style="background-color:#ff9800;">📤 ZIPを共有する</button>
 
   <canvas id="canvas"></canvas>
   <div id="previewContainer"></div>
@@ -139,6 +140,29 @@
         link.href = URL.createObjectURL(content);
         link.download = 'clean_photos.zip';
         link.click();
+      });
+    }
+
+    function shareZip() {
+      if (images.length === 0) return alert("共有する画像がありません");
+
+      const zip = new JSZip();
+      images.forEach(img => {
+        zip.file(img.filename, img.data.split(',')[1], { base64: true });
+      });
+
+      zip.generateAsync({ type: 'blob' }).then(content => {
+        const file = new File([content], "clean_photos.zip", { type: "application/zip" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: '清掃写真ZIP',
+            text: '現場写真を送信します。',
+            files: [file]
+          });
+        } else {
+          alert("この端末では共有できません（対応ブラウザのみ）");
+        }
       });
     }
   </script>
