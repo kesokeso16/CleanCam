@@ -17,21 +17,25 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap;
   margin: 6px 0;
   padding-left: 10px;
+  white-space: nowrap;
+  min-width: 200px;
 }
 
 label input[type="checkbox"] {
   transform: scale(1.4);
   flex-shrink: 0;
+  margin-right: 8px;
 }
 
 label span {
   font-size: 18px;
   line-height: 1;
   display: inline-block;
+  flex-grow: 1;
 }
+
 
 
   </style>
@@ -65,11 +69,26 @@ label span {
   <textarea id="customTags" placeholder="🏷️ カスタムタグ（カンマ区切り）"></textarea>
 
   <div id="checklist">
-    <label><input type="checkbox" value="カビあり"><span>🧫 カビあり</span></label>
-    <label><input type="checkbox" value="水漏れあり"><span>💧 水漏れあり</span></label>
-    <label><input type="checkbox" value="ゴミ残置"><span>🗑️ ゴミ残置</span></label>
-    <label><input type="checkbox" value="異臭あり"><span>🤢 異臭あり</span></label>
-    <label><input type="checkbox" value="破損あり"><span>🪵 破損あり</span></label>
+    <label>
+      <input type="checkbox" value="カビあり">
+      <span>🧫カビあり</span>
+    </label>
+    <label>
+      <input type="checkbox" value="水漏れあり">
+      <span>💧水漏れあり</span>
+    </label>
+    <label>
+      <input type="checkbox" value="ゴミ残置">
+      <span>🗑️ゴミ残置</span>
+    </label>
+    <label>
+      <input type="checkbox" value="異臭あり">
+      <span>🤢異臭あり</span>
+    </label>
+    <label>
+      <input type="checkbox" value="破損あり">
+      <span>🪵破損あり</span>
+    </label>
   </div>
 
   <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
