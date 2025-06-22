@@ -14,30 +14,6 @@
     .camera-button { background-color: #2c7be5; }
     .zip-button { background-color: #28a745; }
 
-    #checklist {
-      max-width: 400px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    label {
-      display: flex;
-      align-items: center;
-      font-size: 18px;
-      gap: 10px;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-    label input[type="checkbox"] {
-      transform: scale(1.4);
-      margin: 0;
-      flex-shrink: 0;
-    }
-    label span {
-      font-size: 20px;
-      white-space: nowrap;
-    }
   </style>
 </head>
 <body>
@@ -68,13 +44,7 @@
 
   <textarea id="customTags" placeholder="🏷️ カスタムタグ（カンマ区切り）"></textarea>
 
-  <div id="checklist">
-    <label><input type="checkbox" value="カビあり"><span>🧫 カビあり</span></label>
-    <label><input type="checkbox" value="水漏れあり"><span>💧 水漏れあり</span></label>
-    <label><input type="checkbox" value="ゴミ残置"><span>🗑️ ゴミ残置</span></label>
-    <label><input type="checkbox" value="異臭あり"><span>🤢 異臭あり</span></label>
-    <label><input type="checkbox" value="破損あり"><span>🪵 破損あり</span></label>
-  </div>
+
 
   <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
   <button onclick="shareZip()" class="zip-button" style="background-color:#ff9800;">📤 ZIPを共有する</button>
