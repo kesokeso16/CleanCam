@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <title>中尾式・カスタム清掃カメラ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
   <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; text-align: center; }
@@ -14,10 +22,31 @@
     .camera-button { background-color: #2c7be5; }
     .zip-button { background-color: #28a745; }
 
+    #checklist {
+      max-width: 400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      gap: 10px;
+    }
+    label input[type="checkbox"] {
+      transform: scale(1.4);
+      margin: 0;
+    }
+    label span {
+      font-size: 20px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
-  <h1>CLEAN CAM ver.2</h1>
+  <h1>CLEAN CAM</h1>
 
   <button onclick="document.getElementById('photoInput').click()" class="camera-button">📷 カメラを起動する</button>
   <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none"><br>
@@ -29,7 +58,7 @@
     <option value="7階">7階</option><option value="8階">8階</option><option value="9階">9階</option>
     <option value="B1">B1</option>
   </select>
-  <input type="text" placeholder="備考" id="room">
+  <input type="text" placeholder="部屋番/備考/など" id="room">
 
   <select id="location">
     <option>廊下</option><option>階段</option><option>エレベーター</option>
@@ -44,7 +73,11 @@
 
   <textarea id="customTags" placeholder="🏷️ カスタムタグ（カンマ区切り）"></textarea>
 
+  <div id="checklist">
+    <label><input type="checkbox" value="清掃・交換前"><span>清掃・交換前</span></label>
+    <label><input type="checkbox" value="清掃・交換後"><span>清掃・交換後</span></label>
 
+  </div>
 
   <button onclick="downloadZip()" class="zip-button">🗂 ZIPで保存</button>
   <button onclick="shareZip()" class="zip-button" style="background-color:#ff9800;">📤 ZIPを共有する</button>
@@ -67,13 +100,15 @@
       reader.onload = function (e) {
         const img = new Image();
         img.onload = function () {
+          const MAX_SIZE = 1280;
+          const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
           const canvas = document.getElementById('canvas');
           const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          ctx.font = '160px sans-serif';
+          ctx.font = '36px sans-serif';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'top';
           ctx.lineWidth = 3;
@@ -94,7 +129,7 @@
           if (customText) customText.split(',').forEach(tag => textLines.push(`🏷️ ${tag.trim()}`));
 
           const maxWidth = Math.max(...textLines.map(t => ctx.measureText(t).width));
-          const lineHeight = 180;
+          const lineHeight = 40;
           const padding = 30;
           ctx.fillStyle = 'rgba(0,0,0,0.5)';
           ctx.fillRect(canvas.width - maxWidth - padding * 2, 20, maxWidth + padding * 2, textLines.length * lineHeight + padding);
@@ -108,12 +143,13 @@
             ctx.fillText(line, x, y);
           });
 
-          const imageURL = canvas.toDataURL('image/jpeg');
+          const imageURL = canvas.toDataURL('image/jpeg', 0.8);
           images.push({ filename: `clean_${Date.now()}.jpg`, data: imageURL });
 
-          const preview = document.createElement('img');
-          preview.src = imageURL;
-          preview.className = 'preview';
+          const preview = document.createElement('a');
+          preview.href = imageURL;
+          preview.download = `clean_${Date.now()}.jpg`;
+          preview.innerHTML = `<img src="${imageURL}" class="preview">`;
           document.getElementById('previewContainer').appendChild(preview);
 
           document.getElementById('photoInput').value = "";
